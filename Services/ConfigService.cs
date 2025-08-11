@@ -9,7 +9,7 @@ namespace ParParWebsite.Api.Services;
 
 public class ConfigService(AppDbContext context) : IConfigService
 {
-    public async Task Create(ConfigDTO configDto, string boundary, CancellationToken cancellationToken)
+    public async Task Create(ConfigDTO configDto, CancellationToken cancellationToken)
     {
         var config = new Config()
         {
