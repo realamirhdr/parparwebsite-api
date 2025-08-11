@@ -1,5 +1,4 @@
 ﻿using ParParWebsite.Api.DTOs;
-using ParParWebsite.Api.Models;
 
 namespace ParParWebsite.Api.Services.Interfaces
 {

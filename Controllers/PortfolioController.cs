@@ -1,12 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Net.Http.Headers;
-using ParParWebsite.Api.DTOs;
-using ParParWebsite.Api.Helper;
 using ParParWebsite.Api.Middleware;
-using ParParWebsite.Api.Models;
-using ParParWebsite.Api.Models.Enums;
-using ParParWebsite.Api.Repositories.Interfaces;
 using ParParWebsite.Api.Services.Interfaces;
 
 namespace ParParWebsite.Api.Controllers

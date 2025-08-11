@@ -15,8 +15,5 @@ public class DisableFormValueModelBindingAttribute : Attribute, IResourceFilter
 
     public void OnResourceExecuted(ResourceExecutedContext context)
     {
-        Console.WriteLine();
-        Console.WriteLine("FDSAFASFDSAFSAFDASFSAFASFASD");
-
     }
 }

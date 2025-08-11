@@ -1,6 +1,5 @@
 ﻿using ParParWebsite.Api.Models.Enums;
 using ParParWebsite.Api.Services.Interfaces;
-using System.Threading;
 using Microsoft.Net.Http.Headers;
 
 namespace ParParWebsite.Api.Services

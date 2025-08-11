@@ -1,28 +1,24 @@
 ﻿using Mapster;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using ParParWebsite.Api.DTOs;
 using ParParWebsite.Api.Helper;
+using ParParWebsite.Api.Infrastructure;
 using ParParWebsite.Api.Models;
 using ParParWebsite.Api.Models.Enums;
-using ParParWebsite.Api.Repositories;
-using ParParWebsite.Api.Repositories.Interfaces;
 using ParParWebsite.Api.Services.Interfaces;
 
 namespace ParParWebsite.Api.Services
 {
-    public class PortfolioService(IPortfolioRepository repository, IFileService fileService) : IPortfolioService
+    public class PortfolioService(AppDbContext context, IFileService fileService) : IPortfolioService
     {
-
         public async Task Create(Stream body, string boundary, CancellationToken cancellationToken)
         {
             var reader = new MultipartReader(boundary, body);
 
             var portfolio = new Portfolio();
             var isCollectionCreated = false;
-            var created = new Portfolio();
             var imageCount = 1;
 
             portfolio.CreatedAt = DateTime.UtcNow;
@@ -41,8 +37,9 @@ namespace ParParWebsite.Api.Services
                     // not file props are done
                     if (!isCollectionCreated)
                     {
-                        created = await repository.Create(portfolio, cancellationToken);
-                        created.Images = new List<PortfolioImage>();
+                        context.Portfolios.Add(portfolio);
+                        await context.SaveChangesAsync(cancellationToken);
+                        portfolio.Images = new List<PortfolioImage>();
                         isCollectionCreated = true;
                     }
 
@@ -52,11 +49,11 @@ namespace ParParWebsite.Api.Services
                             section.Body,
                             contentDisposition,
                             FileType.Thumbnail,
-                            created.Slug,
-                            created.Id,
+                            portfolio.Slug,
+                            portfolio.Id,
                             cancellationToken);
 
-                        created.ThumbnailUrl = thumbnailUrl;
+                        portfolio.ThumbnailUrl = thumbnailUrl;
                     }
 
                     if (fieldName == "Images")
@@ -65,19 +62,19 @@ namespace ParParWebsite.Api.Services
                             section.Body,
                             contentDisposition,
                             FileType.Image,
-                            created.Slug,
-                            created.Id,
+                            portfolio.Slug,
+                            portfolio.Id,
                             cancellationToken,
                             imageCount);
 
                         var collectionImage = new PortfolioImage()
                         {
                             ImageUrl = imageUrl,
-                            Portfolio = created,
-                            CollectionId = created.Id
+                            Portfolio = portfolio,
+                            CollectionId = portfolio.Id
                         };
 
-                        created.Images.Add(collectionImage);;
+                        portfolio.Images.Add(collectionImage);;
 
                         imageCount++;
                     }
@@ -97,22 +94,28 @@ namespace ParParWebsite.Api.Services
                 }
             }
 
-            await repository.Update(created, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
         }
         public async Task<List<PortfolioPreviewDTO>> Get(CancellationToken cancellationToken)
         {
-            var portfolios = await repository.GetAll(cancellationToken);
+            var portfolios = await context.Portfolios
+                .AsNoTracking()
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync(cancellationToken);
 
             return portfolios.Adapt<List<PortfolioPreviewDTO>>();
         }
         public async Task<PortfolioDTO> GetById(int collectionId, CancellationToken cancellationToken)
         {
-            var collection = await repository.GetById(collectionId, cancellationToken);
+            var portfolio = await context.Portfolios
+                .AsNoTracking()
+                .Include(p => p.Images)
+                .FirstOrDefaultAsync(x => x.Id == collectionId, cancellationToken);
 
-            if (collection == null) { throw new Exception($"Portfolio {collectionId} not found."); }
+            if (portfolio == null) { throw new Exception($"Portfolio {collectionId} not found."); }
 
-            var dto = collection.Adapt<PortfolioDTO>();
-            dto.Images = collection.Images.Adapt<List<PortfolioImageDTO>>();
+            var dto = portfolio.Adapt<PortfolioDTO>();
+            dto.Images = portfolio.Images.Adapt<List<PortfolioImageDTO>>();
 
             return dto;
         }
@@ -120,13 +123,13 @@ namespace ParParWebsite.Api.Services
         {
             var reader = new MultipartReader(boundary, body);
 
-            var collection = new Portfolio();
-            collection.Images = new List<PortfolioImage>();
+            var portfolio = new Portfolio();
+            portfolio.Images = new List<PortfolioImage>();
             var existing = new Portfolio();
             var imageCount = 1;
             var areFilesDeletedInitially = false;
 
-            collection.LastUpdatedAt = DateTime.UtcNow;
+            portfolio.LastUpdatedAt = DateTime.UtcNow;
 
             while (await reader.ReadNextSectionAsync(cancellationToken) is { } section)
             {
@@ -154,11 +157,11 @@ namespace ParParWebsite.Api.Services
                             section.Body,
                             contentDisposition,
                             FileType.Thumbnail,
-                            collection.Slug,
-                            collection.Id,
+                            portfolio.Slug,
+                            portfolio.Id,
                             cancellationToken);
 
-                        collection.ThumbnailUrl = thumbnailUrl;
+                        portfolio.ThumbnailUrl = thumbnailUrl;
                     }
 
                     if (fieldName == "Images")
@@ -167,19 +170,19 @@ namespace ParParWebsite.Api.Services
                             section.Body,
                             contentDisposition,
                             FileType.Image,
-                            collection.Slug,
-                            collection.Id,
+                            portfolio.Slug,
+                            portfolio.Id,
                             cancellationToken,
                             imageCount);
 
                         var collectionImage = new PortfolioImage()
                         {
                             ImageUrl = imageUrl,
-                            Portfolio = collection,
-                            CollectionId = collection.Id
+                            Portfolio = portfolio,
+                            CollectionId = portfolio.Id
                         };
 
-                        collection.Images.Add(collectionImage); ;
+                        portfolio.Images.Add(collectionImage); ;
 
                         imageCount++;
                     }
@@ -191,32 +194,36 @@ namespace ParParWebsite.Api.Services
 
                     if (fieldName == "Id")
                     {
-                        collection.Id = int.Parse(value);
-                        existing = await repository.GetById(collection.Id, cancellationToken);
+                        portfolio.Id = int.Parse(value);
+                        existing = await context.Portfolios
+                            .Include(p => p.Images)
+                            .FirstOrDefaultAsync(x => x.Id == portfolio.Id, cancellationToken);
 
-                        if (existing == null) { throw new Exception($"Portfolio {collection.Id} not found."); }
+                        if (existing == null) { throw new Exception($"Portfolio {portfolio.Id} not found."); }
                     } 
                     else if (fieldName == "Title")
                     {
-                        collection.Title = value;
-                        collection.Slug = StringHelper.ToSlug(collection.Title);
+                        portfolio.Title = value;
+                        portfolio.Slug = StringHelper.ToSlug(portfolio.Title);
                     }
                     else if (fieldName == "Caption")
-                        collection.Caption = value;
+                        portfolio.Caption = value;
                 }
             }
 
-            await repository.Update(collection, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
         }
         public async Task Delete(int collectionId, CancellationToken cancellationToken)
         {
-            var existing = await repository.GetById(collectionId, cancellationToken);
+            var existing = await context.Portfolios
+                .FindAsync([collectionId], cancellationToken);
 
             if (existing == null) { throw new Exception($"Portfolio {collectionId} not found."); }
 
             fileService.DeleteFilesOfCollection(existing.Slug, cancellationToken);
 
-            await repository.Delete(collectionId, cancellationToken);
+            context.Portfolios.Remove(existing);
+            await context.SaveChangesAsync(cancellationToken);
         }
     }
 }

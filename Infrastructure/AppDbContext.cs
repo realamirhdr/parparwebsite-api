@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.Design;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+﻿using Microsoft.EntityFrameworkCore;
 using ParParWebsite.Api.Models;
 
 namespace ParParWebsite.Api.Infrastructure
@@ -9,6 +7,7 @@ namespace ParParWebsite.Api.Infrastructure
     {
         public DbSet<Portfolio> Portfolios => Set<Portfolio>();
         public DbSet<PortfolioImage> PortfolioImages => Set<PortfolioImage>();
+        public DbSet<Config> Config => Set<Config>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace ParParWebsite.Api.DTOs;
+﻿namespace ParParWebsite.Api.DTOs;
 
 public class PortfolioPreviewDTO
 {

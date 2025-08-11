@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ParParWebsite.Api.Infrastructure;
 using ParParWebsite.Api.Middleware;
-using ParParWebsite.Api.Repositories.Interfaces;
-using ParParWebsite.Api.Repositories;
 using ParParWebsite.Api.Services.Interfaces;
 using ParParWebsite.Api.Services;
 using Microsoft.AspNetCore.Http.Features;
@@ -12,7 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 // 2) Register your Repositories
-builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
 
 // 3) Register your FileService
 builder.Services.AddScoped<IFileService, FileService>();
