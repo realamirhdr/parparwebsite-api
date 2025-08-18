@@ -15,7 +15,7 @@ public class ConfigService(AppDbContext context) : IConfigService
         {
             ConfigName = configDto.ConfigName,
             ConfigValue = configDto.ConfigValue,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.UtcNow
         };
 
         context.Config.Add(config);
