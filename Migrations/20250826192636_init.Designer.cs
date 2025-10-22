@@ -12,8 +12,8 @@ using ParParWebsite.Api.Infrastructure;
 namespace ParParWebsite.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250712144005_changedposttocollection")]
-    partial class changedposttocollection
+    [Migration("20250826192636_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,31 @@ namespace ParParWebsite.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ParParWebsite.Api.Models.Collection", b =>
+            modelBuilder.Entity("ParParWebsite.Api.Models.Config", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ConfigName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ConfigValue")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Config");
+                });
+
+            modelBuilder.Entity("ParParWebsite.Api.Models.Portfolio", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -56,10 +80,10 @@ namespace ParParWebsite.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Collections");
+                    b.ToTable("Portfolios");
                 });
 
-            modelBuilder.Entity("ParParWebsite.Api.Models.CollectionImage", b =>
+            modelBuilder.Entity("ParParWebsite.Api.Models.PortfolioImage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -67,31 +91,31 @@ namespace ParParWebsite.Api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CollectionId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 
-                    b.Property<int>("PostId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("PostId");
+                    b.HasIndex("CollectionId");
 
-                    b.ToTable("CollectionImages");
+                    b.ToTable("PortfolioImages");
                 });
 
-            modelBuilder.Entity("ParParWebsite.Api.Models.CollectionImage", b =>
+            modelBuilder.Entity("ParParWebsite.Api.Models.PortfolioImage", b =>
                 {
-                    b.HasOne("ParParWebsite.Api.Models.Collection", "Collection")
+                    b.HasOne("ParParWebsite.Api.Models.Portfolio", "Portfolio")
                         .WithMany("Images")
-                        .HasForeignKey("PostId")
+                        .HasForeignKey("CollectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Collection");
+                    b.Navigation("Portfolio");
                 });
 
-            modelBuilder.Entity("ParParWebsite.Api.Models.Collection", b =>
+            modelBuilder.Entity("ParParWebsite.Api.Models.Portfolio", b =>
                 {
                     b.Navigation("Images");
                 });

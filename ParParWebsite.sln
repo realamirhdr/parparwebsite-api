@@ -5,6 +5,14 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParParWebsite.Api", "ParParWebsite.Api.csproj", "{C6A79963-F034-4356-B4E8-71B4FE230C40}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B5EBDAF1-7AE2-4661-996E-CA122DEAE7F9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github", "github", "{9C8D8720-E5F0-4182-BE8B-AF0DFF21D47C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{1515C049-1E74-4FEA-9125-098655A7C6F7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{25ABA05E-6658-4BE6-AD9A-55CC9739B0C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,6 +26,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C6A79963-F034-4356-B4E8-71B4FE230C40} = {B5EBDAF1-7AE2-4661-996E-CA122DEAE7F9}
+		{25ABA05E-6658-4BE6-AD9A-55CC9739B0C7} = {9C8D8720-E5F0-4182-BE8B-AF0DFF21D47C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5CB48A05-CCC4-4B8E-9F51-F6C2B162A3A7}

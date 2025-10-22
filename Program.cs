@@ -28,7 +28,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins("http://localhost:5174") // Your React dev URL
+                .WithOrigins("http://localhost:5173") // Your React dev URL
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
@@ -63,6 +63,22 @@ app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.Use(async (context, next) =>
+{
+    // remove double slash issues by normalizing Path
+    var path = context.Request.Path.Value ?? "";
+    if (path.Contains("/uploads/"))
+    {
+        context.Response.Headers["Access-Control-Allow-Origin"] = "http://localhost:5173";
+        // good practice if you may vary by origin
+        context.Response.Headers["Vary"] = "Origin";
+        // optional if CORP bites you
+        // context.Response.Headers["Cross-Origin-Resource-Policy"] = "cross-origin";
+    }
+
+    await next();
+});
 
 app.UseStaticFiles();
 
