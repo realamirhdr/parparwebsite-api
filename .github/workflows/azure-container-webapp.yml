@@ -16,7 +16,7 @@ jobs:
       - name: Debug info
         run: |
           echo "Starting deployment..."
-          echo "cred: ${{ secrets.AZURE_CREDENTIALS }}"
+          echo "cred: ${{ secrets.AZURE_CREDENTIALS }}fddddddddddddddddddddddddddddddddd"
           echo "Listing files:"
           ls -al
 
