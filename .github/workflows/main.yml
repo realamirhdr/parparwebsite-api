@@ -28,8 +28,8 @@ jobs:
         run: az acr login --name $ACR_NAME
 
       - name: Build Docker image
-        ## run: docker build -f src/Dockerfile -t $ACR_NAME.azurecr.io/$IMAGE_NAME:latest .
-        run: ls 
+        run: docker build -t $ACR_NAME.azurecr.io/$IMAGE_NAME:latest -f src/Dockerfile .
+        # run: ls 
         
       - name: Deploy to Azure Container App
         run: |
