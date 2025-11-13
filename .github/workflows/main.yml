@@ -24,6 +24,13 @@ jobs:
       - name: Show subscription info
         run: az account show
 
+      - name: Login to Azure Container Registry
+        run: az acr login --name $ACR_NAME
+
+      - name: Build Docker image
+        run: docker build -t $ACR_NAME.azurecr.io/$IMAGE_NAME:latest -f src/Dockerfile .
+        # run: ls 
+        
       - name: Deploy to Azure Container App
         run: |
           az containerapp update \
