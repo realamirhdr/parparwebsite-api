@@ -30,3 +30,11 @@ jobs:
           --name $APP_NAME \
           --resource-group $RESOURCE_GROUP \
           --image $ACR_NAME.azurecr.io/$IMAGE_NAME:latest
+
+      - name: Verify deployment
+        run: | 
+          az containerapp show \
+          --name $APP_NAME \
+          --resource-group $RESOURCE_GROUP \
+          --query "properties.template.containers[0].image" \
+           --output tsv
