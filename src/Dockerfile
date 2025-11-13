@@ -20,7 +20,7 @@ RUN dotnet tool install --global dotnet-ef
 ENV PATH="$PATH:/root/.dotnet/tools"
 
 # Add entrypoint script
-COPY entrypoint.sh .
+COPY src/entrypoint.sh .
 RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 8080
