@@ -19,6 +19,12 @@ COPY --from=build /app/publish .
 RUN dotnet tool install --global dotnet-ef
 ENV PATH="$PATH:/root/.dotnet/tools"
 
+RUN pwd
+
+RUN echo ------------------------
+
+RUN ls
+
 # Add entrypoint script
 COPY src/entrypoint.sh .
 RUN chmod +x /app/entrypoint.sh
